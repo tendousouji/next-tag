@@ -7,18 +7,18 @@
     constructor($http, $scope, socket) {
       this.$http = $http;
 
-      $scope.$on('$destroy', function() {
-        //do anything such as remove socket
-      });
-      //TODO - create my component
-      console.log(socket);
-      socket.socketIO.emit('context', {
-        _id: '123'
-      });
+      // $scope.$on('$destroy', function() {
+      //   //do anything such as remove socket
+      // });
+      // //TODO - create my component
+      // console.log(socket);
+      // socket.socketIO.emit('context', {
+      //   _id: '123'
+      // });
 
-      socket.socketIO.on('test', (data) => {
-        console.log(data);
-      });
+      // socket.socketIO.on('test', (data) => {
+      //   console.log(data);
+      // });
     }
   }
 

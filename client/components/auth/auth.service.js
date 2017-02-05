@@ -24,7 +24,7 @@
         email,
         password
       }, callback) {
-        return $http.post('/auth/local', {
+        return $http.post('/api/auth/local', {
             email: email,
             password: password
           })
