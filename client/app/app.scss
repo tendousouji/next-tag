@@ -5,6 +5,9 @@ $fa-font-path: "../bower_components/font-awesome/fonts";
 @import '../bower_components/font-awesome/scss/font-awesome';
 @import 'style/navbar.scss';
 
+body {
+  color: #001d34;
+}
 
 /**
  * App-wide Styles

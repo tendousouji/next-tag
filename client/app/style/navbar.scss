@@ -1,4 +1,21 @@
 .navbar {
-  // border: 2px solid blue;
   background: none;
+}
+
+.navbar-item {
+  font-size: 18px;
+  width: 100px;
+  text-align: center;
+}
+
+.navbar-item.active {
+  border-bottom: 5px solid #001d34;
+}
+
+.navbar-item.active a {
+  background: none !important;
+}
+
+.webiste-logo {
+  margin-right: 15px;
 }
