@@ -1,0 +1,61 @@
+.shopping-page {
+  padding: 0;
+  margin: 0;  
+}
+
+section.shopping {
+  // border: 2px solid blue;
+  height: 500px;
+  background: url('/assets/images/desktop_bg.jpg');
+  background-position: center;
+  background-size: cover;
+}
+
+.shopping-content {
+  background: rgba(238, 238, 238, 0.6);
+  padding-top: 80px;
+  padding-bottom: 30px;
+}
+
+.shopping-content h1 {
+  font-size: 50px;
+  text-align: center;
+  font-weight: 300;
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+.shopping-search {
+  // border: 2px solid red;
+  width: 40%;
+  display: block;
+  margin: 0 auto;
+  height: 50px;
+}
+
+.shopping-search input {
+  float: left;
+  height: 50px;
+  width: 91%;
+  padding-left: 40px;
+  font-size: 17px;
+  font-style: italic;
+}
+
+.shopping-search input:focus {
+  outline: none;
+}
+
+.shopping-search button {
+  float: left;
+  height: 50px;
+  width: 50px;
+  background: #001d34;
+  border: none;
+  color: #ffffff;
+}
+
+.shopping-search button i {
+  font-weight: 300;
+  font-size: 25px;
+}
