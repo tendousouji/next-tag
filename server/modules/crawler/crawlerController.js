@@ -28,33 +28,50 @@ function crawl(url, word, baseUrl, callback) {
 
       var $ = cheerio.load(body);
 
-      if(searchForWord($, word)) {
-        console.log('Word ' + word + ' found at page: ' + url);
+      // if(searchForWord($, word)) {
+      //   console.log('Word ' + word + ' found at page: ' + url);
+      // } else {
+
+      // }
+
+      // $('.product-item   ').each((i, elem) => {
+      //   console.log(elem.children[1].children[0]);
+      // });
+      console.log('----------------------------------------------------------------------');
+      console.log($('.product-item   ').first().children().attr('href'));
+      console.log($('.product-item   ').first().children().children('.title').text());
+      console.log($('.product-item   ').first().children().children('.price-sale').text());
+
+      if($('.product-item   ').first().children().children('.image').children('img').hasClass('lazy')) {
+        console.log($('.product-item   ').first().children().children('.image').children('img').attr('data-src'));
       } else {
-        var absoluteLinks = $("a[href^='http']");
-        var relativeLinks = $("a[href^='/']");
-
-        for (var i = 0; i < absoluteLinks.length; ++i) {
-          var link = absoluteLinks[i].attribs.href;
-          if(pages.indexOf(link) == -1) {
-            if(link.includes(baseUrl)) {
-              pages.push(link);
-            }
-          }
-        }
-
-        for (var j = 0; j < relativeLinks.length; ++j) {
-          var link = relativeLinks[j].attribs.href;
-          var fullLink = baseUrl+link;
-          if(pages.indexOf(fullLink) == -1) {
-            pages.push(fullLink);
-          }
-        }
-
-        // return callback(pages);
-        return callback(null, pages);
-
+        console.log($('.product-item   ').first().children().children('.image').children('img').attr('src'));
       }
+
+      console.log($('.product-item   ').first().children().children('.review').text());
+      
+      var absoluteLinks = $("a[href^='http']");
+      var relativeLinks = $("a[href^='/']");
+
+      for (var i = 0; i < absoluteLinks.length; ++i) {
+        var link = absoluteLinks[i].attribs.href;
+        if(pages.indexOf(link) == -1) {
+          if(link.includes(baseUrl)) {
+            pages.push(link);
+          }
+        }
+      }
+
+      for (var j = 0; j < relativeLinks.length; ++j) {
+        var link = relativeLinks[j].attribs.href;
+        var fullLink = baseUrl+link;
+        if(pages.indexOf(fullLink) == -1) {
+          pages.push(fullLink);
+        }
+      }
+
+      return callback(null, pages);
+
     }
   });
 }
@@ -104,27 +121,26 @@ class CrawlerController {
       console.log(pages.length);
 
       if(pages.length > 0) {
-        var limit = Math.floor(pages.length/8);
+        // var count = 0;
+        // var temps = pages.slice(0, 1);
+        var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
+        // var limit = Math.floor(pages.length/8);
         // console.log(limit);
 
-        async.eachLimit(pages, limit, (link, callback) => {
-          
+        async.mapLimit(temps, 10, (link, callback) => {
+          // ++count;
+          console.log(link);
           crawl(link, searchWord, baseUrl, (error, newPages) => {
             if(error) {
-              // console.log(error);
               return callback(null, []);
             } else {
-              // console.log(newPages.length);
+              // console.log(count);
               return callback(null, newPages.length);
             }
           });
-
         }, (err, response) => {
           if(err) { return console.log(err); }
           console.log(response);
-          // if(response.length > 0) {
-          //   console.log(response)
-          // }
         });
 
       }
