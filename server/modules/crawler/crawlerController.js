@@ -34,21 +34,39 @@ function crawl(url, word, baseUrl, callback) {
 
       // }
 
-      // $('.product-item   ').each((i, elem) => {
-      //   console.log(elem.children[1].children[0]);
-      // });
-      console.log('----------------------------------------------------------------------');
-      console.log($('.product-item   ').first().children().attr('href'));
-      console.log($('.product-item   ').first().children().children('.title').text());
-      console.log($('.product-item   ').first().children().children('.price-sale').text());
+      var productArray = $('.product-item   ');
+      console.log(productArray.length);
+      for (var k = 1; k <= productArray.length; ++k) {
+        // console.log($('.product-item:nth-child(' + k + ')').parent().attr('class'));
+        if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
+          console.log('----------------------------------------------------------------------');
+          console.log($('.product-item:nth-child(' + k + ')').children().attr('href'));
+          console.log($('.product-item:nth-child(' + k + ')').children().attr('title'));
+          console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').text());
 
-      if($('.product-item   ').first().children().children('.image').children('img').hasClass('lazy')) {
-        console.log($('.product-item   ').first().children().children('.image').children('img').attr('data-src'));
-      } else {
-        console.log($('.product-item   ').first().children().children('.image').children('img').attr('src'));
+          var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
+          if(length > 1) {
+            console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src'));
+          } else {
+            console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src'));
+          }
+
+          console.log($('.product-item:nth-child(' + k + ')').children().children('.review').text());
+        }
       }
 
-      console.log($('.product-item   ').first().children().children('.review').text());
+      // console.log('----------------------------------------------------------------------');
+      // console.log($('.product-item   ').first().children().attr('href'));
+      // console.log($('.product-item   ').first().children().children('.title').text());
+      // console.log($('.product-item   ').first().children().children('.price-sale').text());
+
+      // if($('.product-item   ').first().children().children('.image').children('img').hasClass('lazy')) {
+      //   console.log($('.product-item   ').first().children().children('.image').children('img').attr('data-src'));
+      // } else {
+      //   console.log($('.product-item   ').first().children().children('.image').children('img').attr('src'));
+      // }
+
+      // console.log($('.product-item   ').first().children().children('.review').text());
       
       var absoluteLinks = $("a[href^='http']");
       var relativeLinks = $("a[href^='/']");
