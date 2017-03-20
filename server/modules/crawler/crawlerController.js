@@ -3,6 +3,7 @@ import request from 'request';
 import cheerio from 'cheerio';
 import URL from 'url-parse';
 import async from 'async';
+import fs from 'fs';
 
 function handleError(res, statusCode) {
   statusCode = statusCode || 500;
@@ -28,74 +29,93 @@ function crawl(url, word, baseUrl, callback) {
 
       var $ = cheerio.load(body);
 
-      if(searchForWord($, word)) {
-        console.log('Word ' + word + ' found at page: ' + url);
-        return callback(null, pages);
-      } else {
-        var absoluteLinks = $("a[href^='http']");
-        var relativeLinks = $("a[href^='/']");
+      // if(searchForWord($, word)) {
+      //   console.log('Word ' + word + ' found at page: ' + url);
+      //   return callback(null, pages);
+      // } else {
+      //   var absoluteLinks = $("a[href^='http']");
+      //   var relativeLinks = $("a[href^='/']");
 
-        for (var i = 0; i < absoluteLinks.length; ++i) {
-          var link = absoluteLinks[i].attribs.href;
-          if(pages.indexOf(link) == -1) {
-            if(link.includes(baseUrl)) {
-              pages.push(link);
-            }
+      //   for (var i = 0; i < absoluteLinks.length; ++i) {
+      //     var link = absoluteLinks[i].attribs.href;
+      //     if(pages.indexOf(link) == -1) {
+      //       if(link.includes(baseUrl)) {
+      //         pages.push(link);
+      //       }
+      //     }
+      //   }
+
+      //   for (var j = 0; j < relativeLinks.length; ++j) {
+      //     var link = relativeLinks[j].attribs.href;
+      //     var fullLink = baseUrl+link;
+      //     if(pages.indexOf(fullLink) == -1) {
+      //       pages.push(fullLink);
+      //     }
+      //   }
+
+      //   return callback(null, pages);
+      // }
+
+      var productArray = $('.product-item   ');
+      // console.log(productArray.length);
+      for (var k = 1; k <= productArray.length; ++k) {
+        if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
+          // console.log('----------------------------------------------------------------------');
+          // console.log($('.product-item:nth-child(' + k + ')').children().attr('href'));
+          // console.log($('.product-item:nth-child(' + k + ')').children().attr('title'));
+
+          // var price = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').clone().children().remove().end().text();
+          // console.log(price.replace(/\s/g,''));
+          // console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.sale-tag').text());
+          // console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.price-regular').text());
+
+          // var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
+          // if(length > 1) {
+          //   console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src'));
+          // } else {
+          //   console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src'));
+          // }
+
+          // console.log($('.product-item:nth-child(' + k + ')').children().children('.review').text());
+
+          // --------------------------Write data to file--------------------------
+          var link = $('.product-item:nth-child(' + k + ')').children().attr('href');
+          var product = $('.product-item:nth-child(' + k + ')').children().attr('title');
+          var price = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').clone().children().remove().end().text().replace(/\s/g,'');
+          var discount = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.sale-tag').text();
+          var oldPrice = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.price-regular').text();
+          var review = $('.product-item:nth-child(' + k + ')').children().children('.review').text();
+          var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
+          if(length > 1) {
+            var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src');
+          } else {
+            var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src');
           }
+          fs.appendFileSync('tiki.txt', '---------------------------\n' + 'Link: ' + link + '\n' + 'Product: ' + product + '\n' + 'Price: ' + price + '\n' + 'Discount: ' + discount + '\n' + 'Original Price: ' + oldPrice + '\n' + 'Image: ' + image + '\n' + 'Review: ' + review + '\n' );
         }
-
-        for (var j = 0; j < relativeLinks.length; ++j) {
-          var link = relativeLinks[j].attribs.href;
-          var fullLink = baseUrl+link;
-          if(pages.indexOf(fullLink) == -1) {
-            pages.push(fullLink);
-          }
-        }
-
-        return callback(null, pages);
       }
 
-      // var productArray = $('.product-item   ');
-      // console.log(productArray.length);
-      // for (var k = 1; k <= productArray.length; ++k) {
-      //   if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
-      //     console.log('----------------------------------------------------------------------');
-      //     console.log($('.product-item:nth-child(' + k + ')').children().attr('href'));
-      //     console.log($('.product-item:nth-child(' + k + ')').children().attr('title'));
-      //     console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').text());
+      var absoluteLinks = $("a[href^='http']");
+      var relativeLinks = $("a[href^='/']");
 
-      //     var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
-      //     if(length > 1) {
-      //       console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src'));
-      //     } else {
-      //       console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src'));
-      //     }
+      for (var i = 0; i < absoluteLinks.length; ++i) {
+        var link = absoluteLinks[i].attribs.href;
+        if(pages.indexOf(link) == -1) {
+          if(link.includes(baseUrl)) {
+            pages.push(link);
+          }
+        }
+      }
 
-      //     console.log($('.product-item:nth-child(' + k + ')').children().children('.review').text());
-      //   }
-      // }
+      for (var j = 0; j < relativeLinks.length; ++j) {
+        var link = relativeLinks[j].attribs.href;
+        var fullLink = baseUrl+link;
+        if(pages.indexOf(fullLink) == -1) {
+          pages.push(fullLink);
+        }
+      }
 
-      // var absoluteLinks = $("a[href^='http']");
-      // var relativeLinks = $("a[href^='/']");
-
-      // for (var i = 0; i < absoluteLinks.length; ++i) {
-      //   var link = absoluteLinks[i].attribs.href;
-      //   if(pages.indexOf(link) == -1) {
-      //     if(link.includes(baseUrl)) {
-      //       pages.push(link);
-      //     }
-      //   }
-      // }
-
-      // for (var j = 0; j < relativeLinks.length; ++j) {
-      //   var link = relativeLinks[j].attribs.href;
-      //   var fullLink = baseUrl+link;
-      //   if(pages.indexOf(fullLink) == -1) {
-      //     pages.push(fullLink);
-      //   }
-      // }
-
-      // return callback(null, pages);
+      return callback(null, pages);
 
     } else {
       return callback(null, pages);
@@ -133,7 +153,6 @@ class CrawlerController {
       console.log(pages.length);
 
       if(pages.length > 0) {
-        var temps = pages.slice(0, 10);
 
         console.log(Math.floor(pages.length/5));
         var splitArray = []
@@ -157,6 +176,19 @@ class CrawlerController {
         // }
 
         // var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
+        // async.mapLimit(temps, 10, (link, callback) => {
+        //   crawl(link, searchWord, baseUrl, (error, newPages) => {
+        //     if(error) {
+        //       return callback(null, 0);
+        //     } else {
+        //       return callback(null, newPages.length);
+        //     }
+        //   });
+        // }, (err, resp) => {
+        //   if(err) { return console.log(err); }
+        //   console.log(resp);
+        // });
+
         async.waterfall([
           (cb) => {
             let resutlArray = []
