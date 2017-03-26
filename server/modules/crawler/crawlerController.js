@@ -17,19 +17,17 @@ function searchForWord($, word) {
   return (bodyText.indexOf(word.toLowerCase()) != -1);
 }
 
-function crawl(url, word, baseUrl, callback) {
-  var pages = []
-  request(url, (error, response, body) => {
+function writeData (url, callback) {
+  request(url, (error, resp, body) => {
     if(error) {
-      return callback(error, []);
+      return callback(error, {});
     }
 
-    if(response.statusCode == 200) {
+    if(resp.statusCode == 200) {
 
       var $ = cheerio.load(body);
 
       var productArray = $('.product-item   ');
-      // console.log(productArray.length);
       for (var k = 1; k <= productArray.length; ++k) {
         if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
 
@@ -54,27 +52,75 @@ function crawl(url, word, baseUrl, callback) {
         }
       }
 
-      var absoluteLinks = $("a[href^='http']");
-      var relativeLinks = $("a[href^='/']");
+      return callback(null, {});
 
-      for (var i = 0; i < absoluteLinks.length; ++i) {
-        var link = absoluteLinks[i].attribs.href;
-        if(pages.indexOf(link) == -1) {
-          if(link.includes(baseUrl)) {
-            pages.push(link);
+    } else {
+      return callback(null, {});
+    }
+
+  });
+}
+
+function getLinks(url, baseUrl, callback) {
+  var pages = []
+  var word = 'Ngày Xưa Có Một Chuyện Tình';
+  request(url, (error, response, body) => {
+    if(error) {
+      return callback(error, []);
+    }
+
+    if(response.statusCode == 200) {
+
+      var $ = cheerio.load(body);
+
+      if(searchForWord($, word)) {
+        console.log('Word ' + word + ' found at page: ' + url);
+        return callback(null, pages);
+      } else {
+        var absoluteLinks = $("a[href^='http']");
+        var relativeLinks = $("a[href^='/']");
+
+        for (var i = 0; i < absoluteLinks.length; ++i) {
+          var link = absoluteLinks[i].attribs.href;
+          if(pages.indexOf(link) == -1) {
+            if(link.includes(baseUrl)) {
+              pages.push(link);
+            }
           }
         }
-      }
 
-      for (var j = 0; j < relativeLinks.length; ++j) {
-        var link = relativeLinks[j].attribs.href;
-        var fullLink = baseUrl+link;
-        if(pages.indexOf(fullLink) == -1) {
-          pages.push(fullLink);
+        for (var j = 0; j < relativeLinks.length; ++j) {
+          var link = relativeLinks[j].attribs.href;
+          var fullLink = baseUrl+link;
+          if(pages.indexOf(fullLink) == -1) {
+            pages.push(fullLink);
+          }
         }
+
+        return callback(null, pages);
       }
 
-      return callback(null, pages);
+      // var absoluteLinks = $("a[href^='http']");
+      // var relativeLinks = $("a[href^='/']");
+
+      // for (var i = 0; i < absoluteLinks.length; ++i) {
+      //   var link = absoluteLinks[i].attribs.href;
+      //   if(pages.indexOf(link) == -1) {
+      //     if(link.includes(baseUrl)) {
+      //       pages.push(link);
+      //     }
+      //   }
+      // }
+
+      // for (var j = 0; j < relativeLinks.length; ++j) {
+      //   var link = relativeLinks[j].attribs.href;
+      //   var fullLink = baseUrl+link;
+      //   if(pages.indexOf(fullLink) == -1) {
+      //     pages.push(fullLink);
+      //   }
+      // }
+
+      // return callback(null, pages);
 
     } else {
       return callback(null, pages);
@@ -103,7 +149,7 @@ class CrawlerController {
     // pagesToVist.push(startUrl);
     pagesToVist.push(startUrl);
 
-    crawl(startUrl, searchWord, baseUrl, (err, pages) => {
+    getLinks(startUrl, baseUrl, (err, pages) => {
       if(err) { return console.log(err); }
       store.sadd('links', pages);
     });
@@ -134,25 +180,25 @@ class CrawlerController {
         //   console.log(splitArray[t].length);
         // }
 
-        var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
-        async.mapLimit(temps, 10, (link, callback) => {
-          crawl(link, searchWord, baseUrl, (error, newPages) => {
-            if(error) {
-              return callback(null, 0);
-            } else {
-              return callback(null, newPages.length);
-            }
-          });
-        }, (err, resp) => {
-          if(err) { return console.log(err); }
-          console.log(resp);
-        });
-        /*
+        // var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
+        // async.mapLimit(temps, 10, (link, callback) => {
+        //   getLinks(link, baseUrl, (error, newPages) => {
+        //     if(error) {
+        //       return callback(null, 0);
+        //     } else {
+        //       return callback(null, newPages.length);
+        //     }
+        //   });
+        // }, (err, resp) => {
+        //   if(err) { return console.log(err); }
+        //   console.log(resp);
+        // });
         async.waterfall([
           (cb) => {
             let resutlArray = []
+            console.log(resutlArray.length);
             async.mapLimit(splitArray[0], 10, (link, callback) => {
-              crawl(link, searchWord, baseUrl, (error, newPages) => {
+              getLinks(link, baseUrl, (error, newPages) => {
                 if(error) {
                   return callback(null, []);
                 } else {
@@ -174,8 +220,9 @@ class CrawlerController {
           },
           (arg1, cb) => {
             let resutlArray = arg1;
+            console.log(resutlArray.length);
             async.mapLimit(splitArray[1], 10, (link, callback) => {
-              crawl(link, searchWord, baseUrl, (error, newPages) => {
+              getLinks(link, baseUrl, (error, newPages) => {
                 if(error) {
                   return callback(null, []);
                 } else {
@@ -194,8 +241,9 @@ class CrawlerController {
           },
           (arg1, cb) => {
             let resutlArray = arg1;
+            console.log(resutlArray.length);
             async.mapLimit(splitArray[2], 10, (link, callback) => {
-              crawl(link, searchWord, baseUrl, (error, newPages) => {
+              getLinks(link, baseUrl, (error, newPages) => {
                 if(error) {
                   return callback(null, []);
                 } else {
@@ -216,8 +264,9 @@ class CrawlerController {
           },
           (arg1, cb) => {
             let resutlArray = arg1;
+            console.log(resutlArray.length);
             async.mapLimit(splitArray[3], 10, (link, callback) => {
-              crawl(link, searchWord, baseUrl, (error, newPages) => {
+              getLinks(link, baseUrl, (error, newPages) => {
                 if(error) {
                   return callback(null, []);
                 } else {
@@ -238,8 +287,9 @@ class CrawlerController {
           },
           (arg1, cb) => {
             let resutlArray = arg1;
+            console.log(resutlArray.length);
             async.mapLimit(splitArray[4], 10, (link, callback) => {
-              crawl(link, searchWord, baseUrl, (error, newPages) => {
+              getLinks(link, baseUrl, (error, newPages) => {
                 if(error) {
                   return callback(null, []);
                 } else {
@@ -261,8 +311,8 @@ class CrawlerController {
         ], (err, result) => {
           if(err) { return console.log(err); }
           console.log(result.length);
+          console.log(pages.length);
         });
-        */
 
       }
 
