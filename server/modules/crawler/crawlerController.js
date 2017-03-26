@@ -21,7 +21,6 @@ function crawl(url, word, baseUrl, callback) {
   var pages = []
   request(url, (error, response, body) => {
     if(error) {
-      // handleError(error);
       return callback(error, []);
     }
 
@@ -29,57 +28,15 @@ function crawl(url, word, baseUrl, callback) {
 
       var $ = cheerio.load(body);
 
-      // if(searchForWord($, word)) {
-      //   console.log('Word ' + word + ' found at page: ' + url);
-      //   return callback(null, pages);
-      // } else {
-      //   var absoluteLinks = $("a[href^='http']");
-      //   var relativeLinks = $("a[href^='/']");
-
-      //   for (var i = 0; i < absoluteLinks.length; ++i) {
-      //     var link = absoluteLinks[i].attribs.href;
-      //     if(pages.indexOf(link) == -1) {
-      //       if(link.includes(baseUrl)) {
-      //         pages.push(link);
-      //       }
-      //     }
-      //   }
-
-      //   for (var j = 0; j < relativeLinks.length; ++j) {
-      //     var link = relativeLinks[j].attribs.href;
-      //     var fullLink = baseUrl+link;
-      //     if(pages.indexOf(fullLink) == -1) {
-      //       pages.push(fullLink);
-      //     }
-      //   }
-
-      //   return callback(null, pages);
-      // }
-
       var productArray = $('.product-item   ');
       // console.log(productArray.length);
       for (var k = 1; k <= productArray.length; ++k) {
         if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
-          // console.log('----------------------------------------------------------------------');
-          // console.log($('.product-item:nth-child(' + k + ')').children().attr('href'));
-          // console.log($('.product-item:nth-child(' + k + ')').children().attr('title'));
-
-          // var price = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').clone().children().remove().end().text();
-          // console.log(price.replace(/\s/g,''));
-          // console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.sale-tag').text());
-          // console.log($('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.price-regular').text());
-
-          // var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
-          // if(length > 1) {
-          //   console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src'));
-          // } else {
-          //   console.log($('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src'));
-          // }
-
-          // console.log($('.product-item:nth-child(' + k + ')').children().children('.review').text());
 
           // --------------------------Write data to file--------------------------
+          var id = $('.product-item:nth-child(' + k + ')').attr('data-id');
           var link = $('.product-item:nth-child(' + k + ')').children().attr('href');
+          var category = $('.product-item:nth-child(' + k + ')').attr('data-category').replace('(not set)/', '');
           var product = $('.product-item:nth-child(' + k + ')').children().attr('title');
           var price = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').clone().children().remove().end().text().replace(/\s/g,'');
           var discount = $('.product-item:nth-child(' + k + ')').children().children('.price-sale').children('.sale-tag').text();
@@ -91,7 +48,9 @@ function crawl(url, word, baseUrl, callback) {
           } else {
             var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src');
           }
-          fs.appendFileSync('tiki.txt', '---------------------------\n' + 'Link: ' + link + '\n' + 'Product: ' + product + '\n' + 'Price: ' + price + '\n' + 'Discount: ' + discount + '\n' + 'Original Price: ' + oldPrice + '\n' + 'Image: ' + image + '\n' + 'Review: ' + review + '\n' );
+          fs.appendFileSync('tiki.txt', '---------------------------\n' + 'Id: ' + id + '\n' + 'Link: ' + link +  '\n' 
+            + 'Category: ' + category + '\n' + 'Product: ' + product + '\n' + 'Price: ' + price + '\n' + 'Discount: ' + discount + '\n' 
+            + 'Original Price: ' + oldPrice + '\n' + 'Image: ' + image + '\n' + 'Review: ' + review + '\n' );
         }
       }
 
@@ -175,20 +134,20 @@ class CrawlerController {
         //   console.log(splitArray[t].length);
         // }
 
-        // var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
-        // async.mapLimit(temps, 10, (link, callback) => {
-        //   crawl(link, searchWord, baseUrl, (error, newPages) => {
-        //     if(error) {
-        //       return callback(null, 0);
-        //     } else {
-        //       return callback(null, newPages.length);
-        //     }
-        //   });
-        // }, (err, resp) => {
-        //   if(err) { return console.log(err); }
-        //   console.log(resp);
-        // });
-
+        var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
+        async.mapLimit(temps, 10, (link, callback) => {
+          crawl(link, searchWord, baseUrl, (error, newPages) => {
+            if(error) {
+              return callback(null, 0);
+            } else {
+              return callback(null, newPages.length);
+            }
+          });
+        }, (err, resp) => {
+          if(err) { return console.log(err); }
+          console.log(resp);
+        });
+        /*
         async.waterfall([
           (cb) => {
             let resutlArray = []
@@ -303,6 +262,8 @@ class CrawlerController {
           if(err) { return console.log(err); }
           console.log(result.length);
         });
+        */
+
       }
 
     });
