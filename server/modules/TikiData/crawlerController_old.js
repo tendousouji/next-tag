@@ -17,20 +17,22 @@ function searchForWord($, word) {
   return (bodyText.indexOf(word.toLowerCase()) != -1);
 }
 
-function writeData (url, callback) {
-  request(url, (error, resp, body) => {
+function getLinks(url, baseUrl, callback) {
+  var pages = []
+  var word = 'Ngày Xưa Có Một Chuyện Tình';
+  request(url, (error, response, body) => {
     if(error) {
-      return callback(error, {});
+      console.log('Error in Get Links');
+      return callback(error, []);
     }
 
-    if(resp.statusCode == 200) {
+    if(response.statusCode == 200) {
 
       var $ = cheerio.load(body);
 
       var productArray = $('.product-item   ');
       for (var k = 1; k <= productArray.length; ++k) {
         if($('.product-item:nth-child(' + k + ')').parent().attr('class') == 'product-box-list') {
-
           // --------------------------Write data to file--------------------------
           var id = $('.product-item:nth-child(' + k + ')').attr('data-id');
           var link = $('.product-item:nth-child(' + k + ')').children().attr('href');
@@ -42,85 +44,37 @@ function writeData (url, callback) {
           var review = $('.product-item:nth-child(' + k + ')').children().children('.review').text();
           var length = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').length;
           if(length > 1) {
-            var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src');
+           var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img:nth-child(2)').attr('src');
           } else {
-            var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src');
+           var image = $('.product-item:nth-child(' + k + ')').children().children('.image').children('img').attr('src');
           }
           fs.appendFileSync('tiki.txt', '---------------------------\n' + 'Id: ' + id + '\n' + 'Link: ' + link +  '\n' 
-            + 'Category: ' + category + '\n' + 'Product: ' + product + '\n' + 'Price: ' + price + '\n' + 'Discount: ' + discount + '\n' 
-            + 'Original Price: ' + oldPrice + '\n' + 'Image: ' + image + '\n' + 'Review: ' + review + '\n' );
+           + 'Category: ' + category + '\n' + 'Product: ' + product + '\n' + 'Price: ' + price + '\n' + 'Discount: ' + discount + '\n' 
+           + 'Original Price: ' + oldPrice + '\n' + 'Image: ' + image + '\n' + 'Review: ' + review + '\n' );
         }
       }
 
-      return callback(null, {});
+      var absoluteLinks = $("a[href^='http']");
+      var relativeLinks = $("a[href^='/']");
 
-    } else {
-      return callback(null, {});
-    }
-
-  });
-}
-
-function getLinks(url, baseUrl, callback) {
-  var pages = []
-  var word = 'Ngày Xưa Có Một Chuyện Tình';
-  request(url, (error, response, body) => {
-    if(error) {
-      return callback(error, []);
-    }
-
-    if(response.statusCode == 200) {
-
-      var $ = cheerio.load(body);
-
-      if(searchForWord($, word)) {
-        console.log('Word ' + word + ' found at page: ' + url);
-        return callback(null, pages);
-      } else {
-        var absoluteLinks = $("a[href^='http']");
-        var relativeLinks = $("a[href^='/']");
-
-        for (var i = 0; i < absoluteLinks.length; ++i) {
-          var link = absoluteLinks[i].attribs.href;
-          if(pages.indexOf(link) == -1) {
-            if(link.includes(baseUrl)) {
-              pages.push(link);
-            }
+      for (var i = 0; i < absoluteLinks.length; ++i) {
+        var link = absoluteLinks[i].attribs.href;
+        if(pages.indexOf(link) == -1) {
+          if(link.includes(baseUrl)) {
+            pages.push(link);
           }
         }
-
-        for (var j = 0; j < relativeLinks.length; ++j) {
-          var link = relativeLinks[j].attribs.href;
-          var fullLink = baseUrl+link;
-          if(pages.indexOf(fullLink) == -1) {
-            pages.push(fullLink);
-          }
-        }
-
-        return callback(null, pages);
       }
 
-      // var absoluteLinks = $("a[href^='http']");
-      // var relativeLinks = $("a[href^='/']");
+      for (var j = 0; j < relativeLinks.length; ++j) {
+        var link = relativeLinks[j].attribs.href;
+        var fullLink = baseUrl+link;
+        if(pages.indexOf(fullLink) == -1) {
+          pages.push(fullLink);
+        }
+      }
 
-      // for (var i = 0; i < absoluteLinks.length; ++i) {
-      //   var link = absoluteLinks[i].attribs.href;
-      //   if(pages.indexOf(link) == -1) {
-      //     if(link.includes(baseUrl)) {
-      //       pages.push(link);
-      //     }
-      //   }
-      // }
-
-      // for (var j = 0; j < relativeLinks.length; ++j) {
-      //   var link = relativeLinks[j].attribs.href;
-      //   var fullLink = baseUrl+link;
-      //   if(pages.indexOf(fullLink) == -1) {
-      //     pages.push(fullLink);
-      //   }
-      // }
-
-      // return callback(null, pages);
+      return callback(null, pages);
 
     } else {
       return callback(null, pages);
@@ -155,7 +109,7 @@ class CrawlerController {
     });
     
     store.smembers('links', (err, pages) => {
-      console.log(pages.length);
+      // console.log(pages.length);
 
       if(pages.length > 0) {
 
@@ -181,7 +135,8 @@ class CrawlerController {
         // }
 
         // var temps = ['https://tiki.vn/pin-sac-may-anh/c2662'];
-        // async.mapLimit(temps, 10, (link, callback) => {
+        // var temps1 = pages.slice(0, 100);
+        // async.mapLimit(temps1, 10, (link, callback) => {
         //   getLinks(link, baseUrl, (error, newPages) => {
         //     if(error) {
         //       return callback(null, 0);
@@ -193,6 +148,7 @@ class CrawlerController {
         //   if(err) { return console.log(err); }
         //   console.log(resp);
         // });
+
         async.waterfall([
           (cb) => {
             let resutlArray = []
@@ -209,12 +165,15 @@ class CrawlerController {
               if(err) { return console.log(err); }
               // console.log(resp);
               for (var t = 0; t < resp.length; ++t) {
-                for (var l = 0; l < resp[t].length; ++l) {
-                  if(resutlArray.indexOf(resp[t][l]) == -1) {
-                    resutlArray.push(resp[t][l]);
+                if(resp[t].length > 0) {
+                  for (var l = 0; l < resp[t].length; ++l) {
+                    if(resutlArray.indexOf(resp[t][l]) == -1) {
+                      resutlArray.push(resp[t][l]);
+                    }
                   }
                 }
               }
+              console.log('Result: '+resutlArray.length);
               return cb(null, resutlArray);
             });
           },
@@ -232,10 +191,15 @@ class CrawlerController {
             }, (err, resp) => {
               if(err) { return console.log(err); }
               for (var t = 0; t < resp.length; ++t) {
-                if(resutlArray.indexOf(resp[t]) == -1) {
-                  resutlArray.push(resp[t]);
+                if(resp[t].length > 0) {
+                  for (var l = 0; l < resp[t].length; ++l) {
+                    if(resutlArray.indexOf(resp[t][l]) == -1) {
+                      resutlArray.push(resp[t][l]);
+                    }
+                  }
                 }
               }
+              console.log('Result: '+resutlArray.length);
               return cb(null, resutlArray);
             });
           },
@@ -253,12 +217,15 @@ class CrawlerController {
             }, (err, resp) => {
               if(err) { return console.log(err); }
               for (var t = 0; t < resp.length; ++t) {
-                for (var l = 0; l < resp[t].length; ++l) {
-                  if(resutlArray.indexOf(resp[t][l]) == -1) {
-                    resutlArray.push(resp[t][l]);
+                if(resp[t].length > 0) {
+                  for (var l = 0; l < resp[t].length; ++l) {
+                    if(resutlArray.indexOf(resp[t][l]) == -1) {
+                      resutlArray.push(resp[t][l]);
+                    }
                   }
                 }
               }
+              console.log('Result: '+resutlArray.length);
               return cb(null, resutlArray);
             });
           },
@@ -276,12 +243,15 @@ class CrawlerController {
             }, (err, resp) => {
               if(err) { return console.log(err); }
               for (var t = 0; t < resp.length; ++t) {
-                for (var l = 0; l < resp[t].length; ++l) {
-                  if(resutlArray.indexOf(resp[t][l]) == -1) {
-                    resutlArray.push(resp[t][l]);
+                if(resp[t].length > 0) {
+                  for (var l = 0; l < resp[t].length; ++l) {
+                    if(resutlArray.indexOf(resp[t][l]) == -1) {
+                      resutlArray.push(resp[t][l]);
+                    }
                   }
                 }
               }
+              console.log('Result: '+resutlArray.length);
               return cb(null, resutlArray);
             });
           },
@@ -299,21 +269,34 @@ class CrawlerController {
             }, (err, resp) => {
               if(err) { return console.log(err); }
               for (var t = 0; t < resp.length; ++t) {
-                for (var l = 0; l < resp[t].length; ++l) {
-                  if(resutlArray.indexOf(resp[t][l]) == -1) {
-                    resutlArray.push(resp[t][l]);
+                if(resp[t].length > 0) {
+                  for (var l = 0; l < resp[t].length; ++l) {
+                    if(resutlArray.indexOf(resp[t][l]) == -1) {
+                      resutlArray.push(resp[t][l]);
+                    }
                   }
                 }
               }
+              console.log('Result: '+resutlArray.length);
               return cb(null, resutlArray);
             });
           }
         ], (err, result) => {
           if(err) { return console.log(err); }
           console.log(result.length);
-          console.log(pages.length);
-        });
+          var subPages = result;
+          for(var i = 0; i < subPages.length; ++i) {
+            if(pages.indexOf(subPages[i]) != -1) {
+              subPages.splice(i, 1);
+              i = 0;
+            }
+          }
 
+          console.log(subPages.length);
+          console.log(pages.length);
+
+        });
+        
       }
 
     });

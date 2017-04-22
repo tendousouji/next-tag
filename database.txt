@@ -1,0 +1,17 @@
+products {
+  productId: String,
+  productLink: String,
+  name: String,
+  price: String,
+  discount: String,
+  originPrice: String,
+  image: String,
+  website: String,
+  category: ObjectID
+}
+
+category {
+  name: String,
+  parentCategories: ObjectID,
+  childCategories: [ObjectID]
+}

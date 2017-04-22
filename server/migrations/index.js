@@ -6,6 +6,9 @@ import kernel from '../app';
 async.waterfall([
   (cb) => {
     require('./user')(kernel.model.User, cb);
+  },
+  (cb) => {
+  	require('./product')(kernel.model.Product, cb);
   }
 ], (err) => {
   if (err) {
