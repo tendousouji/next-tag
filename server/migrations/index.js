@@ -8,7 +8,7 @@ async.waterfall([
     require('./user')(kernel.model.User, cb);
   },
   (cb) => {
-  	require('./product')(kernel.model.Product, cb);
+  	require('./product')(kernel.model.Product, kernel.model.Category, cb);
   }
 ], (err) => {
   if (err) {

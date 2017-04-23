@@ -17,6 +17,7 @@ kernel.loadModule(require('./modules/thing'));
 kernel.loadModule(require('./modules/crawler'));
 kernel.loadModule(require('./modules/TikiData'));
 kernel.loadModule(require('./modules/product'));
+kernel.loadModule(require('./modules/category'));
 // kernel.loadModule(require('./modules/crawler'));
 //co0mpose then start server
 kernel.compose();
