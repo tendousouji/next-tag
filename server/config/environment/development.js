@@ -27,6 +27,10 @@ module.exports = {
   },
   REST_PREFIX: '/api/v1/',
 
+  ES: {
+    hosts: 'localhost:9200',
+  },
+
   QUEUE_NAME: 'mean',
   QUEUE_CONFIG: {
     prefix: 'q',
