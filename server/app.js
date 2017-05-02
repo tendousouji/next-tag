@@ -14,6 +14,7 @@ kernel.loadModule(require('./modules/user'));
 kernel.loadModule(require('./modules/like'));
 kernel.loadModule(require('./modules/comments'));
 kernel.loadModule(require('./modules/thing'));
+kernel.loadModule(require('./modules/es'));
 kernel.loadModule(require('./modules/crawler'));
 kernel.loadModule(require('./modules/TikiData'));
 kernel.loadModule(require('./modules/product'));

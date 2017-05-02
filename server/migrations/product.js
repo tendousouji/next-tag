@@ -2,7 +2,7 @@
 import async from 'async';
 import fs from 'fs';
 
-module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
+module.exports = (ProductTypeModel, CategoryTypeModel, ES, cb) => {
   async.waterfall([
     (cb) => {
       console.log('Migrate data from Tiki data file');
@@ -10,16 +10,6 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
       // console.log(result.length);
       var productArray = [];
       for (var i = 0; i < result.length; i+=10) {
-        // console.log(result[i]);
-        // console.log(result[i+1].replace('Id: ', ''));
-        // console.log(result[i+2].replace('Link: ', ''));
-        // console.log(result[i+3].replace('Category: ', ''));
-        // console.log(result[i+4].replace('Product: ', ''));
-        // console.log(result[i+5].replace('Price: ', ''));
-        // console.log(result[i+6].replace('Discount: ', ''));
-        // console.log(result[i+7].replace('Original Price: ', ''));
-        // console.log(result[i+8].replace('Image: ', ''));
-        // console.log(result[i+9].replace('Review: ', ''));
         productArray.push({
           'id' : result[i+1].replace('Id: ', ''),
           'link' : result[i+2].replace('Link: ', ''),
@@ -33,6 +23,8 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
         });
       }
       // console.log(productArray);
+      let id = 0;
+      let categoryId = 0;
       async.each(productArray, (item, callback) => {
         CategoryTypeModel.findOne({'name': item.category})
           .then(category => {
@@ -41,7 +33,7 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
 
               // console.log(category.id);
 
-              ProductTypeModel.create({
+              let data = {
                 productId: item.id,
                 productLink: item.link,
                 productName: item.name,
@@ -51,8 +43,31 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
                 image: item.image,
                 website: 'https://tiki.vn/',
                 categoryId: category.id
-              })
-              .then(() => {});
+              }
+
+              ES.create({
+                type : 'products',
+                id: id,
+                data : data
+              }, (err, resp) => {
+                if(err) { return console.log(err); }
+                console.log(resp);
+              });
+
+              ++id;
+
+              // ProductTypeModel.create({
+              //   productId: item.id,
+              //   productLink: item.link,
+              //   productName: item.name,
+              //   price: item.price,
+              //   discount: item.discount,
+              //   originPrice: item.originPrice,
+              //   image: item.image,
+              //   website: 'https://tiki.vn/',
+              //   categoryId: category.id
+              // })
+              // .then(() => {});
 
             } else {
 
@@ -61,7 +76,17 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
               })
               .then(category => {
                 // console.log(resp);
-                ProductTypeModel.create({
+
+                ES.create({
+                  type : 'categories',
+                  id: category.id,
+                  data : { 'name': item.category }
+                }, (err, resp) => {
+                  if(err) { return console.log(err); }
+                  console.log(resp);
+                });
+
+                let data = {
                   productId: item.id,
                   productLink: item.link,
                   productName: item.name,
@@ -71,23 +96,37 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
                   image: item.image,
                   website: 'https://tiki.vn/',
                   categoryId: category.id
-                })
-                .then(() => {});
+                }
+
+                ES.create({
+                  type : 'products',
+                  id: id,
+                  data : data
+                }, (err, resp) => {
+                  if(err) { return console.log(err); }
+                  console.log(resp);
+                });
+
+                ++id;
+
+                // ProductTypeModel.create({
+                //   productId: item.id,
+                //   productLink: item.link,
+                //   productName: item.name,
+                //   price: item.price,
+                //   discount: item.discount,
+                //   originPrice: item.originPrice,
+                //   image: item.image,
+                //   website: 'https://tiki.vn/',
+                //   categoryId: category.id
+                // })
+                // .then(() => {});
+
               });
 
             }
 
           });
-        // ProductTypeModel.find({})
-        //   .remove()
-        //   .then(() => {
-        //     ProductTypeModel.create({
-                    
-        //     })
-        //     .then(() => {
-              
-        //     });
-        //   });
       }, (err) => {
         if(err) { return console.log('Migrate data error'); }
         console.log('Migrate data success');
@@ -95,6 +134,6 @@ module.exports = (ProductTypeModel, CategoryTypeModel, cb) => {
       });
     }
   ], () => {
-    cb();
+      cb();
   });  
 }

@@ -87,6 +87,7 @@ class ESComponent {
   }
 }
 
+// exports.Mapping = Mapping;
 exports.ESComponent = ESComponent;
 
 exports.config = {
@@ -94,7 +95,7 @@ exports.config = {
 		options: {
 			host: 'localhost:9200'
 		},
-		index: 'health-stars',
+		index: 'nextag',
 		settings: {
 			analysis: {
 			  analyzer: {
