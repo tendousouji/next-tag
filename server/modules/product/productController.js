@@ -7,9 +7,26 @@ class ProductController {
 
   search(req, res) {
 
-    
+    var seachWord = req.body.search;
+    console.log(seachWord);
 
-    return res.status(200).json({'data': 'Hello World'});
+    let query = {
+      query: {
+        term: {
+          productName: seachWord
+        }
+      }
+    }
+
+    this.kernel.ES.search(query, 'products', (err, resp) => {
+      if(err) { 
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      // console.log(resp);
+      return res.status(200).json(resp);
+    })
+
   }
 
 
