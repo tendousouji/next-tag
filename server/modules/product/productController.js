@@ -6,7 +6,6 @@ class ProductController {
   }
 
   search(req, res) {
-
     var seachWord = req.body.search;
     console.log(seachWord);
 
@@ -26,9 +25,7 @@ class ProductController {
       // console.log(resp);
       return res.status(200).json(resp);
     })
-
   }
-
 
 }
 

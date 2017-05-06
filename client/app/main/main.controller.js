@@ -4,7 +4,7 @@
 
   class MainController {
 
-    constructor($http, $scope, socket) {
+    constructor($http, $scope, socket, ProductSearchService) {
       this.$http = $http;
 
       // $scope.$on('$destroy', function() {
@@ -19,6 +19,17 @@
       // socket.socketIO.on('test', (data) => {
       //   console.log(data);
       // });
+
+      $scope.getProduct = (form) => {
+        
+        var searchWorld = $scope.searchWorld;
+        console.log(searchWorld);
+        ProductSearchService.productSearch(searchWorld, (err, resp) => {
+          if(err) { console.log(err); }
+          console.log(resp);
+        });
+
+      }
     }
   }
 
