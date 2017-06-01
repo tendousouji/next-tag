@@ -4,7 +4,7 @@
 
   class MainController {
 
-    constructor($http, $scope, socket, ProductSearchService) {
+    constructor($http, $scope, $state, socket, ProductSearchService, $cookies) {
       this.$http = $http;
 
       // $scope.$on('$destroy', function() {
@@ -22,11 +22,19 @@
 
       $scope.getProduct = (form) => {
         
+        if($cookies.get('products')) {
+          $cookies.remove('products');
+        }
+
         var searchWorld = $scope.searchWorld;
         console.log(searchWorld);
         ProductSearchService.productSearch(searchWorld, (err, resp) => {
           if(err) { console.log(err); }
-          console.log(resp);
+          // console.log(resp);
+
+          // $cookies.put('products', resp);
+          localStorage.setItem('products', JSON.stringify(resp));
+          $state.go('search');
         });
 
       }

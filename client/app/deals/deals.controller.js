@@ -10,5 +10,4 @@
 
   angular.module('meanApp.deals')
     .controller('DealsController', DealsController);
-
 })();
