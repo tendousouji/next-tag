@@ -16,7 +16,17 @@ class TikiCrawlerController {
 
   index(req, res) {
 
-    // this.kernel.module.Crawler.queue('https://tiki.vn/pin-sac-may-anh/c2662');
+    let store = this.kernel.redisClient;
+
+    // store.smembers('tikiLinks', (err, pages) => {
+      
+    // });
+
+    // this.kernel.module.Crawler.queue('https://tiki.vn');
+
+    store.flushdb((err, response) => {
+      console.log(response);
+    });
 
     return res.status(200).json('Hello World');
   }
