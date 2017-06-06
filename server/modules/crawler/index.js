@@ -8,7 +8,7 @@ exports.name = 'Crawler'
 exports.module = (kernel) => {
   
   var crawler = new Crawler({
-    maxConnections: 10,
+    maxConnections: 90,
     callback: function(err, resp, done) {
       if(err) { return console.log(err); }
 
@@ -104,7 +104,7 @@ exports.module = (kernel) => {
                   data : productData
                 }, (err, resp) => {
                   if(err) { return console.log(err); }
-                  console.log(resp);
+                  // console.log(resp);
                 });
               }
             }
@@ -116,7 +116,7 @@ exports.module = (kernel) => {
                 data : productData
               }, (err, resp) => {
                 if(err) { return console.log(err); }
-                console.log(resp);
+                // console.log(resp);
               });
             }
           });
@@ -146,6 +146,74 @@ exports.module = (kernel) => {
       } else if (checkLink.includes(lazadaUrl)) {
 
         // console.log('Lazada Link');
+        // console.log($('title'));
+        var name = $('#prod_title').text();
+        if(name) {
+          // console.log('=============================');
+          // console.log(name);
+          // console.log($('#productImageBox').children('.productImage').children('meta').attr('content'));
+          // console.log($('.wishlist-add').attr('data-config-sku'));
+          // console.log($('#special_price_box').text());
+          // console.log($('#price_box').text());
+          // console.log($('#product_saving_percentage').text());
+          // console.log($('link[rel="canonical"]').attr('href'));
+          // console.log($('.prod_details').text());
+          var productId = $('.wishlist-add').attr('data-config-sku');
+          var productLink = $('link[rel="canonical"]').attr('href');
+          var productName = name;
+          var price = $('#special_price_box').text();
+          var discount = $('#product_saving_percentage').text();
+          var originPrice = $('#price_box').text();
+          var image = $('#productImageBox').children('.productImage').children('meta').attr('content');
+          var description = $('.prod_details').text();
+
+          let productQuery = {
+            query: {
+              match: {
+                productId: productId
+              }
+            } 
+          }
+
+          let productData = {
+            productId: productId,
+            productLink: productLink,
+            productName: productName,
+            price: price,
+            discount: discount,
+            originPrice: originPrice,
+            image: image,
+            description: description,
+            website: 'http://www.lazada.vn/'
+          }
+
+          ES.search(productQuery, 'products', (err, resp) => {
+            if(err) {
+              if(err.status == 404) {
+                ES.create({
+                  type : 'products',
+                  id: productId,
+                  data : productData
+                }, (err, resp) => {
+                  if(err) { return console.log(err); }
+                  console.log(resp);
+                });
+              }
+            }
+            // console.log(resp);
+            if(resp.items.length == 0) {
+              ES.create({
+                type : 'products',
+                id: productId,
+                data : productData
+              }, (err, resp) => {
+                if(err) { return console.log(err); }
+                console.log(resp);
+              });
+            }
+          });
+
+        }
 
         store.smembers('lazadaLinks', (err, pages) => {
           for (var i = 0; i < absoluteLinks.length; ++i) {

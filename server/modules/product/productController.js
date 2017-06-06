@@ -10,8 +10,9 @@ class ProductController {
     console.log(seachWord);
 
     let query = {
+      size: 100,
       query: {
-        term: {
+        match_phrase: {
           productName: seachWord
         }
       }
@@ -22,7 +23,7 @@ class ProductController {
         console.log(err);
         return res.status(500).json(err);
       }
-      // console.log(resp);
+      // console.log('Search Result: ' + resp.items.length);
       return res.status(200).json(resp);
     })
   }

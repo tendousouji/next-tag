@@ -135,6 +135,8 @@ module.exports = (ProductTypeModel, CategoryTypeModel, ES, Redis, cb) => {
     // }
     (cb) => {
       Redis.sadd('tikiLinks', ['https://tiki.vn']);
+      Redis.sadd('lazadaLinks', ['http://www.lazada.vn']);
+      Redis.sadd('hotDealLinks', ['https://www.hotdeal.vn/ho-chi-minh']);
     }
   ], () => {
       cb();

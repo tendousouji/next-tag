@@ -10,7 +10,7 @@
       return ProductSearchResource.productSearch({search: search})
         .$promise.then(data => {
           if(data) {
-            
+            // console.log(data);
           } else {
             
           }
