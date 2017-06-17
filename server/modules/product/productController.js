@@ -8,9 +8,15 @@ class ProductController {
   search(req, res) {
     var seachWord = req.body.search;
     console.log(seachWord);
+    var page = parseInt(req.query.page) - 1;
+    var limit = parseInt(req.query.limit);
+    var startFrom = (page*limit) + 1;
+    console.log(page);
+    console.log(startFrom);
 
     let query = {
-      size: 100,
+      from: startFrom,
+      size: limit,
       query: {
         match_phrase: {
           productName: seachWord

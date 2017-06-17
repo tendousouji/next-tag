@@ -19,6 +19,8 @@
       // socket.socketIO.on('test', (data) => {
       //   console.log(data);
       // });
+      $scope.page = 1;
+      $scope.perPage = 10;
 
       $scope.getProduct = (form) => {
         
@@ -26,9 +28,11 @@
           $cookies.remove('products');
         }
 
-        var searchWorld = $scope.searchWorld;
-        console.log(searchWorld);
-        ProductSearchService.productSearch(searchWorld, (err, resp) => {
+        var queries = 'page='+$scope.page+'&limit='+$scope.perPage;
+        var searchWord = $scope.searchWorld;
+        $cookies.put('searchWord', searchWord);
+        // console.log(searchWorld);
+        ProductSearchService.productSearch(searchWord, queries, (err, resp) => {
           if(err) { console.log(err); }
           // console.log(resp);
 

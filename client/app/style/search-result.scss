@@ -12,3 +12,26 @@
   width: 75px;
   height: 75px;
 }
+
+.price {
+  color: #b11c1e;
+  font-weight: bold;
+  text-align: center;
+}
+
+.oldPrice {
+  color: #c57165;
+  text-decoration: line-through;
+  font-weight: 600;
+  width: 50%;
+}
+
+.discount {
+  color: #98808b;
+  font-weight: 600;
+  width: 50%;
+}
+
+.price-des {
+  width: 100%;
+}
