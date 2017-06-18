@@ -5,6 +5,7 @@ angular.module('meanApp', ['meanApp.auth', 'meanApp.admin', 'meanApp.constants',
     'validation.match', 'angular-growl', 'angular-loading-bar', 'ngAnimate', 'meanApp.deals', 'meanApp.products_search',
     'meanApp.search-result'
   ])
+  .value('$', $)
   .config(function($urlRouterProvider, $locationProvider, cfpLoadingBarProvider) {
     $urlRouterProvider.otherwise('/');
     cfpLoadingBarProvider.includeSpinner = false;

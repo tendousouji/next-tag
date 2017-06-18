@@ -35,9 +35,9 @@ exports.module = (kernel) => {
         var productId = $('.wishlist-add').attr('data-config-sku');
         var productLink = $('link[rel="canonical"]').attr('href');
         var productName = name;
-        var price = $('#special_price_box').text();
+        var price = parseInt($('#special_price_box').text().replace(/\./g, ''));
         var discount = $('#product_saving_percentage').text();
-        var originPrice = $('#price_box').text();
+        var originPrice = parseInt($('#price_box').text().replace(' VND,', '').replace(/\./g, ''));
         var image = $('#productImageBox').children('.productImage').children('meta').attr('content');
         var description = $('.prod_details').text();
 
@@ -75,15 +75,26 @@ exports.module = (kernel) => {
             }
           }
           // console.log(resp);
-          if(resp.items.length == 0) {
-            ES.create({
-              type : 'products',
-              id: productId,
-              data : productData
-            }, (err, resp) => {
-              if(err) { return console.log(err); }
-              console.log(resp);
-            });
+          if(resp) {
+            if(resp.items.length == 0) {
+              ES.create({
+                type : 'products',
+                id: productId,
+                data : productData
+              }, (err, resp) => {
+                if(err) { return console.log(err); }
+                console.log(resp);
+              });
+            } else {
+              ES.update({
+                type : 'products',
+                id: productId,
+                data : productData
+              }, (err, resp) => {
+                if(err) { return console.log(err); }
+                // console.log(resp);
+              });
+            }
           }
         });
 

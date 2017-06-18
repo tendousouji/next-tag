@@ -11,6 +11,7 @@
       this.products = JSON.parse(result).items;
       this.perPage = 10;
       this.page = 1;
+      console.log(result);
       // console.log(this.products);
       this.listChange = () => {
         var searchWord = $cookies.get('searchWord');

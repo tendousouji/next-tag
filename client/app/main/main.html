@@ -1,10 +1,10 @@
-<div class="container-fluid shopping-page">
+<div class="container-fluid shopping-page" height-adjust>
   <section class="shopping">
     <div class="shopping-content">
       <h1>Find and Compare Millions</h1>
       <h1>of Products, All in One Spot</h1>
       <form name="form" ng-submit="getProduct(form)" class="shopping-search" novalidate>
-        <input type="text" ng-model="searchWorld" placeholder="What can we help you find?">
+        <input type="text" id="searchInput" ng-model="searchWorld" placeholder="What can we help you find?">
         <button type="submit">
           <i class="fa fa-search"></i>
         </button>

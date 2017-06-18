@@ -17,6 +17,9 @@ class ProductController {
     let query = {
       from: startFrom,
       size: limit,
+      sort: {
+        'price' : { 'order': 'asc' }
+      },
       query: {
         match_phrase: {
           productName: seachWord
