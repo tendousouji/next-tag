@@ -7,7 +7,7 @@ exports.module = (kernel) => {
   var store = kernel.redisClient;
   var crawler = new Crawler({
     maxConnections: 30,
-    rateLimit: 1000,
+    rateLimit: 3000,
     callback: function(err, resp, done) {
       if(err) { return console.log(err); }
 
@@ -86,6 +86,7 @@ exports.module = (kernel) => {
                 console.log(resp);
               });
             } else {
+              console.log('Product ID: '+productId);
               ES.update({
                 type : 'products',
                 id: productId,

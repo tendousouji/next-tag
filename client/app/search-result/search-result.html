@@ -34,8 +34,8 @@
               <img class="img-responsive" style="height: 40px;" ng-if="product.website == 'https://www.hotdeal.vn/ho-chi-minh/'" src="/assets/images/hotdeal.png" alt="">
             </div>
             <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
-              <p class="price">{{product.price}}</p>
-              <span class="price-des"><span class="oldPrice">{{product.originPrice}}</span> <span class="discount">{{product.discount}}</span></span>
+              <p class="price">{{product.price | number}} VND</p>
+              <span class="price-des"><span class="oldPrice">{{product.originPrice | number}} VND</span> <span class="discount">{{product.discount}}</span></span>
             </div>
           </div>
         </div>

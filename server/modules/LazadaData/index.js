@@ -8,7 +8,7 @@ exports.module = (kernel) => {
 
   var crawler = new Crawler({
     maxConnections: 30,
-    rateLimit: 1000,
+    rateLimit: 2000,
     callback: function(err, resp, done) {
       if(err) { return console.log(err); }
 
